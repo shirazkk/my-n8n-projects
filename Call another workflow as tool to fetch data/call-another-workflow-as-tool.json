@@ -1,0 +1,214 @@
+{
+  "name": "call-another-workflow-as-tool",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### Main workflow: AI agent using custom tool",
+        "height": 486.5625,
+        "width": 927.5,
+        "color": 7
+      },
+      "id": "1f284f8a-7939-45b5-9586-3103d2142369",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "649d4bac-d693-40f6-b811-cab690b870be",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        0,
+        128
+      ],
+      "webhookId": "e3f23177-c7c1-417b-a513-1c1090dda0a2",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "20288b53-fdb6-4abb-8b57-43498a219e93",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        256,
+        336
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "content": "**This tool calls the sub-workflow below**",
+        "height": 179.21380662202682,
+        "width": 197.45572294791873,
+        "color": 5
+      },
+      "id": "7250a29c-701a-443f-95fb-1ff112df44a1",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "**Set your credentials**",
+        "height": 171,
+        "width": 150,
+        "color": 2
+      },
+      "id": "1d990616-24eb-43f2-8239-70395fb57a8b",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Try it out\n\nSelect **Chat** at the bottom and enter:\n\n_Hi! Please suggest something to do. I feel like learning something new._",
+        "height": 214.8397420554627,
+        "width": 185.9375,
+        "color": 4
+      },
+      "id": "152ae76d-3651-4d59-ba99-4c218bd2bd4a",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -304,
+        96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        48,
+        336
+      ],
+      "id": "535c2de8-7890-4af2-86c3-00215ce6a74d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "e25KvxOaatr7H7oj",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an ai agent your task is to fetch products details from given tool "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        208,
+        128
+      ],
+      "id": "d72e44b4-6ef2-4c64-9f8a-dfdd550f3a04",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "description": "call this tool to get products info",
+        "workflowId": {
+          "__rl": true,
+          "value": "NxfX5MYLIZyfmsYa",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/NxfX5MYLIZyfmsYa",
+          "cachedResultName": "call-an-api"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        352
+      ],
+      "id": "f233b188-e25f-4355-a9be-938a36b7f14a",
+      "name": "Call 'Let your AI call an API'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Let your AI call an API'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cefe753b-4338-479a-8e37-828930d98fa1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b172e13dc27e894d9a6bf97cf0790d045381385c16f6121b60d3cdafff910373"
+  },
+  "id": "4F0daEI6IhDwwG1G",
+  "tags": []
+}

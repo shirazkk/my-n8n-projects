@@ -1,0 +1,346 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -448,
+        -64
+      ],
+      "id": "dfa1627d-e002-42b0-8df1-a97b25b73404",
+      "name": "When chat message received",
+      "webhookId": "777df46b-b6ce-4716-a9ce-be6462d94a93"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -240,
+        -112
+      ],
+      "id": "d2140010-81fd-4830-b0ad-57dd6fa7c771",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        112
+      ],
+      "id": "ad81a241-80db-429d-ad4a-f3189226f80b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "cksgoAMH5c3NPqu0",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "36be6724-d9a5-4112-8610-de2305bd5cbb"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        320,
+        -80
+      ],
+      "id": "c1cf4204-2c44-44f5-ba1d-a09446c6494d",
+      "name": "MCP Server Trigger",
+      "webhookId": "36be6724-d9a5-4112-8610-de2305bd5cbb"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create an event in Google Calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "shirazkk8@gmail.com",
+          "mode": "list",
+          "cachedResultName": "shirazkk8@gmail.com"
+        },
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', `the end time of event define by user if the user not provide end time of event so askhim when that event end `, 'string') }}",
+        "useDefaultReminders": "",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        128
+      ],
+      "id": "b9f0b3e1-58f2-4c8d-83fc-b1844a3aec0a",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Bor7UH7b0TKfCK7E",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "shirazkk8@gmail.com",
+          "mode": "list",
+          "cachedResultName": "shirazkk8@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        656,
+        80
+      ],
+      "id": "b580fb76-19d0-4ba3-8fba-f2aa2f1052fe",
+      "name": "Delete an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Bor7UH7b0TKfCK7E",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "calendar": {
+          "__rl": true,
+          "value": "shirazkk8@gmail.com",
+          "mode": "list",
+          "cachedResultName": "shirazkk8@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        192
+      ],
+      "id": "405bed7f-514a-43ec-8ff7-b9e18090dab7",
+      "name": "Get an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Bor7UH7b0TKfCK7E",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "shirazkk8@gmail.com",
+          "mode": "list",
+          "cachedResultName": "shirazkk8@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        224
+      ],
+      "id": "5846fc36-3188-4cfa-ac87-4c38903c7004",
+      "name": "Update an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Bor7UH7b0TKfCK7E",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        192
+      ],
+      "id": "f88e13c5-7bd1-4133-8466-903aadea25cb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://shiraznew.app.n8n.cloud/mcp/36be6724-d9a5-4112-8610-de2305bd5cbb",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        112
+      ],
+      "id": "bade34ed-20b8-438c-9e8d-c6529658856e",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        320
+      ],
+      "id": "dd183281-a781-41f9-ab76-96630e743c2f",
+      "name": "Create an event in Google Calendar1",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Bor7UH7b0TKfCK7E",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar1": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b6d11687-0f22-4e8f-b352-e6a2066465ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b172e13dc27e894d9a6bf97cf0790d045381385c16f6121b60d3cdafff910373"
+  },
+  "id": "2kWgnfVsoUKUeWxw",
+  "tags": []
+}

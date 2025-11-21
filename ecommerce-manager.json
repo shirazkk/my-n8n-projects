@@ -1,0 +1,214 @@
+{
+  "name": "E-commerce Automation Suite",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "workflow-start",
+      "name": "Main Workflow Entry",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "stock-alert-trigger",
+      "name": "Stock Alert - Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [450, 100]
+    },
+    {
+      "parameters": {
+        "url": "https://pakishoes.vercel.app/api/products",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "fetch-products",
+      "name": "Fetch Current Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 100],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "key": "product_stock_data"
+      },
+      "id": "get-previous-stock",
+      "name": "Get Previous Stock",
+      "type": "n8n-nodes-base.staticData",
+      "typeVersion": 1,
+      "position": [850, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get current products\nconst currentProducts = $input.all();\nconst previousStock = $('Get Previous Stock').first().json.products || [];\nconst previousStockMap = {};\npreviousStock.forEach(product => { previousStockMap[product.id] = product.stock; });\nconst LOW_STOCK_THRESHOLD = 5;\nconst alerts = [];\nfor (const item of currentProducts) {\n  const product = item.json;\n  const currentStock = product.stock || 0;\n  const previousStockLevel = previousStockMap[product.id];\n  if (currentStock === 0) {\n    alerts.push({ alertType: 'OUT_OF_STOCK', productName: product.name, productSlug: product.slug, currentStock, previousStock: previousStockLevel || 'N/A', productId: product.id, message: `⚠️ OUT OF STOCK: ${product.name} is now out of stock!`});\n  } else if (currentStock <= LOW_STOCK_THRESHOLD && (previousStockLevel === undefined || previousStockLevel > LOW_STOCK_THRESHOLD)) {\n    alerts.push({ alertType: 'LOW_STOCK', productName: product.name, productSlug: product.slug, currentStock, previousStock: previousStockLevel || 'N/A', productId: product.id, message: `⚠️ LOW STOCK: ${product.name} has only ${currentStock} units remaining`});\n  }\n}\nreturn [{ json: { alerts, currentProducts: currentProducts.map(item => ({id: item.json.id, name: item.json.name, slug: item.json.slug, stock: item.json.stock || 0})), timestamp: new Date().toISOString()}}];"
+      },
+      "id": "check-stock-changes",
+      "name": "Check Stock Changes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 100]
+    },
+    {
+      "parameters": {
+        "key": "product_stock_data",
+        "value": "={{ $json.currentProducts }}"
+      },
+      "id": "update-stock-data",
+      "name": "Update Stock Data",
+      "type": "n8n-nodes-base.staticData",
+      "typeVersion": 1,
+      "position": [1250, 100]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.alerts.length }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "check-alerts-exist",
+      "name": "Check Alerts Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const alerts = $json.alerts;\nreturn alerts.map(alert => ({ json: alert }));"
+      },
+      "id": "split-alerts",
+      "name": "Split Alerts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 100]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sendTo": "your-email@gmail.com",
+        "subject": "={{ $json.alertType === 'OUT_OF_STOCK' ? '🚨 Product Out of Stock Alert' : '⚠️ Low Stock Alert' }}",
+        "emailType": "html",
+        "message": "=<html><body><h2>{{ $json.message }}</h2><p>Product: {{ $json.productName }}</p><p>Current Stock: {{ $json.currentStock }}</p></body></html>"
+      },
+      "id": "send-stock-alert-email",
+      "name": "Send Stock Alert Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1850, 100]
+    },
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "minutes", "minutesInterval": 5 } ] }
+      },
+      "id": "order-confirmation-trigger",
+      "name": "Order Check - Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [450, 400]
+    },
+    {
+      "parameters": { "url": "https://pakishoes.vercel.app/api/orders" },
+      "id": "fetch-orders",
+      "name": "Fetch Recent Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 400],
+      "retryOnFail": true,
+      "maxTries": 3
+    },
+    {
+      "parameters": { "key": "processed_orders" },
+      "id": "get-processed-orders",
+      "name": "Get Processed Orders",
+      "type": "n8n-nodes-base.staticData",
+      "typeVersion": 1,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter new orders\nconst currentOrders = $input.all();\nconst processedOrderIds = $('Get Processed Orders').first().json.orderIds || [];\nconst newOrders = currentOrders.filter(item => !processedOrderIds.includes(item.json.id));\nreturn newOrders.map(order => ({ json: order.json }));"
+      },
+      "id": "filter-new-orders",
+      "name": "Filter New Orders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sendTo": "={{ $json.customerEmail }}",
+        "subject": "✅ Order Confirmation - Order #{{ $json.orderId }}",
+        "emailType": "html",
+        "message": "=<html><body><h2>✅ Order Confirmed!</h2><p>Hi {{ $json.customerName }}, your order has been received!</p></body></html>"
+      },
+      "id": "send-order-confirmation",
+      "name": "Send Order Confirmation",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "key": "processed_orders",
+        "value": "={{ ($json.orderId ? [$json.orderId] : []).concat($('Get Processed Orders').first().json.orderIds || []) }}"
+      },
+      "id": "mark-order-processed",
+      "name": "Mark Order as Processed",
+      "type": "n8n-nodes-base.staticData",
+      "typeVersion": 1,
+      "position": [1450, 400]
+    },
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "days", "daysInterval": 1 } ] },
+        "triggerTimes": { "item": [ { "hour": 10, "minute": 0 } ] }
+      },
+      "id": "feedback-collector-trigger",
+      "name": "Feedback Check - Daily at 10 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [450, 1000]
+    },
+    {
+      "parameters": { "key": "feedback_sent_orders", "value": "={{ ($json.orderId ? [$json.orderId] : []).concat($('Get Feedback Sent Orders').first().json.orderIds || [])) }}" },
+      "id": "update-feedback-sent",
+      "name": "Update Feedback Sent Orders",
+      "type": "n8n-nodes-base.staticData",
+      "typeVersion": 1,
+      "position": [1450, 1000]
+    }
+  ],
+  "connections": {
+    "stock-alert-trigger": { "main": [ [ { "node": "fetch-products", "type": "main", "index": 0 } ] ] },
+    "fetch-products": { "main": [ [ { "node": "check-stock-changes", "type": "main", "index": 0 } ] ] },
+    "check-stock-changes": { "main": [ [ { "node": "update-stock-data", "type": "main", "index": 0 }, { "node": "check-alerts-exist", "type": "main", "index": 0 } ] ] },
+    "check-alerts-exist": { "main": [ [ { "node": "split-alerts", "type": "main", "index": 0 } ] ] },
+    "split-alerts": { "main": [ [ { "node": "send-stock-alert-email", "type": "main", "index": 0 } ] ] },
+    "order-confirmation-trigger": { "main": [ [ { "node": "fetch-orders", "type": "main", "index": 0 } ] ] },
+    "fetch-orders": { "main": [ [ { "node": "get-processed-orders", "type": "main", "index": 0 } ] ] },
+    "get-processed-orders": { "main": [ [ { "node": "filter-new-orders", "type": "main", "index": 0 } ] ] },
+    "filter-new-orders": { "main": [ [ { "node": "send-order-confirmation", "type": "main", "index": 0 }, { "node": "mark-order-processed", "type": "main", "index": 0 } ] ] },
+    "feedback-collector-trigger": { "main": [ [ { "node": "update-feedback-sent", "type": "main", "index": 0 } ] ] }
+  }
+}

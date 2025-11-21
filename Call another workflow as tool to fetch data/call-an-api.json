@@ -1,0 +1,59 @@
+{
+  "name": "call-an-api",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "889f9aa9-7c6e-42e7-ab5f-09b5c468bb48",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        528,
+        -224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "https://pakishoes.vercel.app/api/products",
+        "options": {}
+      },
+      "id": "f66f2225-2e19-4cd9-b771-34ab5b1273d9",
+      "name": "Call the API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        800,
+        -208
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call the API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call the API": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c75ec8d3-0bb2-406a-80d5-66c4683ffe6a",
+  "meta": {
+    "instanceId": "b172e13dc27e894d9a6bf97cf0790d045381385c16f6121b60d3cdafff910373"
+  },
+  "id": "NxfX5MYLIZyfmsYa",
+  "tags": []
+}

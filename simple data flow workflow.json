@@ -1,0 +1,247 @@
+{
+  "name": "simple data flow workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        -48
+      ],
+      "id": "bff37b66-e4e4-42e8-81fe-7d3167944e72",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "xS3m2RP2CsVL7rlX",
+          "mode": "list",
+          "cachedResultName": "employyes",
+          "cachedResultUrl": "/projects/Q3MkfKiD2CRUxSBv/datatables/xS3m2RP2CsVL7rlX"
+        },
+        "matchType": "allConditions",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -48
+      ],
+      "id": "b6b233b4-0117-4951-9205-c494c4878d2a",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "037b509b-a864-476a-ac74-160459204bf5",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "1fd7dc83-40a9-4f6f-8631-97cb785e4ea1",
+              "name": "salary",
+              "value": "={{ $json.salary }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        -48
+      ],
+      "id": "8e9cc959-35f2-4a48-953b-4e61f1e136f0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items\nconst items = $input.all();\n\n// Process each item\nfor (const item of items) {\n  if (item.json.salary <= 25000) {\n    item.json.salary += 5000;\n  }\n}\n\n// Return the modified items array\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        -48
+      ],
+      "id": "03ae67fa-560b-4bf5-8fa5-4c36d99b70c7",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2e60b73d-3718-48b1-86fd-8fa238775ef2",
+              "leftValue": "={{ $json.salary }}",
+              "rightValue": 29000,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        -48
+      ],
+      "id": "e05ccb7d-d3f3-40f7-a3fc-f1283a3fde55",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "xS3m2RP2CsVL7rlX"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": "={{ $json.name }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "age",
+              "displayName": "age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "salary",
+              "displayName": "salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d2b15fe8-7ed1-4e13-bbe6-705418b4f31a",
+      "name": "Update row(s)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2688,
+        -48
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6ac306b8-03bc-4fa5-9927-facea3502bcb",
+  "meta": {
+    "instanceId": "b172e13dc27e894d9a6bf97cf0790d045381385c16f6121b60d3cdafff910373"
+  },
+  "id": "HJyyal6sepcAHK8b",
+  "tags": []
+}
